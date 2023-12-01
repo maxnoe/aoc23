@@ -100,8 +100,16 @@ fn part2(input: &str) -> i32 {
 
 pub fn day1() {
     let input = get_input(1, 2023).expect("Error getting input");
-    println!("Part1: {}", part1(&input));
-    println!("Part2: {}", part2(&input));
+
+    let now = std::time::Instant::now();
+    let answer1 = part1(&input);
+    let elapsed = now.elapsed();
+    println!("Part1: {} (in {} µs)", answer1, elapsed.as_micros());
+
+    let now = std::time::Instant::now();
+    let answer2 = part2(&input);
+    let elapsed = now.elapsed();
+    println!("Part2: {} (in {} µs)", answer2, elapsed.as_micros());
 }
 
 
@@ -111,7 +119,7 @@ mod tests {
 
 
     #[test]
-    fn test_calibration_value() {
+    fn test_day1_calibration_value() {
         assert_eq!(calibration_value("1abc2"), 12);
         assert_eq!(calibration_value("pqr3stu8vwx"), 38);
         assert_eq!(calibration_value("a1b2c3d4e5f"), 15);
@@ -119,13 +127,13 @@ mod tests {
     }
 
     #[test]
-    fn test_part1() {
+    fn test_day1_part1() {
         let input: String = "1abc2\npqr3stu8vwx\na1b2c3d4e5f\ntreb7uchet".into();
         assert_eq!(part1(&input), 142);
     }
 
     #[test]
-    fn test_calibration_value_strings() {
+    fn test_day1_calibration_value_strings() {
         assert_eq!(calibration_value_strings("two1nine"), 29);
         assert_eq!(calibration_value_strings("eightwothree"), 83);
         assert_eq!(calibration_value_strings("abcone2threexyz"), 13);
@@ -136,7 +144,7 @@ mod tests {
     }
 
     #[test]
-    fn test_part2() {
+    fn test_day1_part2() {
         let input: String = "two1nine\neightwothree\nabcone2threexyz\nxtwone3four\n4nineeightseven2\nzoneight234\n7pqrstsixteen".into();
         assert_eq!(part2(&input), 281);
     }
