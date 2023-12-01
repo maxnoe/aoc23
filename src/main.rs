@@ -1,7 +1,23 @@
+mod day1;
 mod input;
-use crate::input::get_input;
+
+use std::env;
 
 fn main() {
-    let input = get_input(1, 2023).expect("Failed getting input");
-    println!("{}", input);
+    let args: Vec<String> = env::args().collect();
+
+    if args.len() != 2 {
+        println!("Usage: aocmaxnoe2021 <day>");
+        std::process::exit(1);
+    }
+
+    let day: u8 = args[1].parse().expect("Day must be a number");
+
+    match day {
+        1 => day1::day1(),
+        _ => {
+            println!("Day {} not yet implemented", day);
+            std::process::exit(1);
+        }
+    }
 }
