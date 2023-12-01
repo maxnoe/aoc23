@@ -48,6 +48,7 @@ fn calibration_value(line: &str) -> i32 {
     return 10 * (first as i32 - zero) + (last as i32 - zero);
 }
 
+
 fn calibration_value_strings(line: &str) -> i32 {
     let mut first = '\0';
     let mut last = '\0';
@@ -62,29 +63,18 @@ fn calibration_value_strings(line: &str) -> i32 {
             continue;
         }
 
-        match NUMBERS.get(&chr) {
-            Some(numbers) => {
-                for (number, val) in numbers.entries() {
-                    if pos + number.len() > line.len() {
-                        continue;
+        if let Some(numbers) = NUMBERS.get(&chr) {
+            for (number, val) in numbers.entries() {
+                if line[pos..].starts_with(number) {
+                    if first == '\0' {
+                        first = *val;
                     }
-
-                    if &&line[pos..pos + number.len()] == number {
-                        if first == '\0' {
-                            first = *val;
-                        }
-                        last = *val;
-                        break;
-                    }
-
+                    last = *val;
+                    break;
                 }
-            },
-            None => {}
-        }
-    }
 
-    if first == '\0' || last == '\0' {
-        panic!("Must not happen");
+            }
+        }
     }
 
     return 10 * (first as i32 - ZERO) + (last as i32 - ZERO);
