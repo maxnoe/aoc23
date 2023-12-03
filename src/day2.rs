@@ -69,8 +69,12 @@ fn part2(games: &Vec<Game>) -> i64 {
 }
 
 pub fn day2() {
-    let input_str = get_input(2, 2023).expect("Error getting input");
-    let input = parse_input(&input_str);
+    let input = get_input(2, 2023).expect("Error getting input");
+
+    let now = std::time::Instant::now();
+    let input = parse_input(&input);
+    let elapsed = now.elapsed();
+    println!("Parsing input took {} µs",  elapsed.as_micros());
 
     let now = std::time::Instant::now();
     let answer1 = part1(&input);

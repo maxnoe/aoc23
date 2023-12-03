@@ -119,8 +119,11 @@ fn part2(input: &Plan) -> i64 {
 
 pub fn day3() {
     let input = get_input(3, 2023).expect("Error getting input");
+
+    let now = std::time::Instant::now();
     let input = parse_input(&input);
-    println!("{:?}", input);
+    let elapsed = now.elapsed();
+    println!("Parsing input took {} µs",  elapsed.as_micros());
 
     let now = std::time::Instant::now();
     let answer1 = part1(&input);
