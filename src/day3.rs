@@ -1,77 +1,126 @@
 use crate::input::get_input;
+use std::collections::HashMap;
 
 
-type Plan = Vec<Vec<char>>;
-
-fn is_part_number(plan: &Plan , row: usize, col: usize, length: usize) -> bool{
+fn is_part_number(chars: &Vec<Vec<char>> , row: usize, col: usize, length: usize) -> (bool, Option<(usize, usize)>) {
     // left
-    let n_rows = plan.len();
-    let n_cols = plan[0].len();
+    let n_rows = chars.len();
+    let n_cols = chars[0].len();
 
-    if col > 0 && plan[row][col - 1] != '.' {
-        return true;
+    if col > 0 && chars[row][col - 1] != '.' {
+        let gear = if chars[row][col - 1] == '*' {
+            Some((row, col - 1))
+        } else {
+            None
+        };
+        return (true, gear);
     }
 
     // right
-    if col + length < n_cols && plan[row][col + length] != '.' {
-        return true;
+    if col + length < n_cols && chars[row][col + length] != '.' {
+        let gear = if chars[row][col + length] == '*' {
+            Some((row, col + length))
+        } else {
+            None
+        };
+        return (true, gear);
     }
 
     let left = if col == 0 {0} else {col - 1};
     let right = std::cmp::min(col + length + 1, n_cols);
     // above
-    if row > 0 && plan[row - 1][left..right].iter().any(|c| !c.is_digit(10) && *c != '.') {
-        return true;
+    if row > 0 {
+        if let Some(col) = (left..right).filter(|col| chars[row - 1][*col] != '.').next() {
+            let gear = if chars[row - 1][col] == '*' {
+                Some((row - 1, col))
+            } else {
+                None
+            };
+            return (true, gear);
+        }
     }
     // below
-    if (row + 1) < n_rows && plan[row + 1][left..right].iter().any(|c| !c.is_digit(10) && *c != '.') {
-        return true;
+    if (row + 1) < n_rows {
+        if let Some(col) = (left..right).filter(|col| chars[row + 1][*col] != '.').next() {
+            let gear = if chars[row + 1][col] == '*' {
+                Some((row + 1, col))
+            } else {
+                None
+            };
+            return (true, gear);
+        }
     }
-    false
+    (false, None)
+}
+
+#[derive(Debug)]
+struct Plan {
+    part_numbers: Vec<i64>,
+    gears: HashMap<(usize, usize), Vec<i64>>,
 }
 
 
-fn part1(input: &str) -> i64 {
-    let plan: Plan = input.lines()
+fn parse_input(input: &str) -> Plan {
+
+    let chars: Vec<Vec<char>> = input.lines()
         .map(|l| l.chars().collect())
         .collect();
 
-    let mut sum = 0;
-    let n_rows = plan.len();
-    let n_cols = plan[0].len();
+    let n_rows = chars.len();
+    let n_cols = chars[0].len();
+
+    let mut plan = Plan{
+        part_numbers: Vec::new(),
+        gears: HashMap::new(),
+    };
 
     for row in 0..n_rows {
         let mut parsing = false;
         let mut first = 0;
 
         for col in 0..n_cols {
-            let is_digit = plan[row][col].is_digit(10);
+            let is_digit = chars[row][col].is_digit(10);
 
             // if we reach a non-number or end-of-line, we have a whole number
             if parsing && (!is_digit || col + 1 == n_cols) {
                 parsing = false;
                 let length = if is_digit {col - first + 1} else {col - first};
-                if !is_part_number(&plan, row, first, length) {
+                let (is_part, gear) = is_part_number(&chars, row, first, length);
+                let number: i64 = chars[row][first..first+length].iter()
+                    .collect::<String>()
+                    .parse().unwrap();
+                if !is_part {
                     continue;
                 }
-                let number: String = plan[row][first..first+length].iter().collect();
-                sum += number.parse::<i64>().unwrap();
+                plan.part_numbers.push(number);
+                if let Some(gear) = gear {
+                    if !plan.gears.contains_key(&gear) {
+                        plan.gears.insert(gear, Vec::new());
+                    }
+                    plan.gears.get_mut(&gear).unwrap().push(number);
+                }
             } else if !parsing && is_digit {
                 parsing = true;
                 first = col;
             }
         }
     }
-
-    return sum;
+    plan
 }
 
-fn part2(input: &str) -> i64 {
-    0
+
+fn part1(plan: &Plan) -> i64 {
+    plan.part_numbers.iter().sum()
+}
+
+fn part2(input: &Plan) -> i64 {
+    input.gears.values().filter(|v| v.len() == 2).map(|v| v[0] * v[1]).sum()
 }
 
 pub fn day3() {
     let input = get_input(3, 2023).expect("Error getting input");
+    let input = parse_input(&input);
+    println!("{:?}", input);
 
     let now = std::time::Instant::now();
     let answer1 = part1(&input);
@@ -104,6 +153,13 @@ mod tests {
 
     #[test]
     fn test_day3_part1() {
-        assert_eq!(part1(&TEST_INPUT), 4361);
+        let input = parse_input(TEST_INPUT);
+        assert_eq!(part1(&input), 4361);
+    }
+
+    #[test]
+    fn test_day3_part2() {
+        let input = parse_input(TEST_INPUT);
+        assert_eq!(part2(&input), 467835);
     }
 }
