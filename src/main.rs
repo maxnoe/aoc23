@@ -4,6 +4,7 @@ mod day3;
 mod day4;
 mod day5;
 mod day6;
+mod day8;
 mod input;
 
 use std::env;
@@ -25,6 +26,7 @@ fn main() {
         4 => day4::day4(),
         5 => day5::day5(),
         6 => day6::day6(),
+        8 => day8::day8(),
         _ => {
             println!("Day {} not yet implemented", day);
             std::process::exit(1);
