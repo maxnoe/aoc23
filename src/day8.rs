@@ -1,5 +1,5 @@
 use crate::input::get_input;
-use std::{collections::HashMap, hash::Hash};
+use std::collections::HashMap;
 
 enum Direction {
     L,
@@ -46,7 +46,23 @@ fn part1(input: &Input) -> i64 {
 }
 
 fn part2(input: &Input) -> i64 {
-    0
+    let mut positions: Vec<&str> = input.network.keys().filter(|k| k.ends_with("A")).cloned().collect();
+    let mut steps = 0;
+    let mut instruction = 0;
+
+    while !positions.iter().all(|p| p.ends_with("Z")) {
+        for i in 0..positions.len() {
+            positions[i] = match input.instructions[instruction] {
+                Direction::R => input.network[positions[i]].1,
+                Direction::L => input.network[positions[i]].0,
+                    
+            };
+        }
+        steps += 1;
+        instruction = (instruction + 1) % input.instructions.len();
+    }
+
+    steps
 }
 
 pub fn day8() {
@@ -93,6 +109,23 @@ AAA = (BBB, BBB)
 BBB = (AAA, ZZZ)
 ZZZ = (ZZZ, ZZZ)");
         assert_eq!(part1(&input), 6);
+    }
+
+    #[test]
+    fn test_day8_part2() {
+        let input = parse_input("LR
+
+11A = (11B, XXX)
+11B = (XXX, 11Z)
+11Z = (11B, XXX)
+22A = (22B, XXX)
+22B = (22C, 22C)
+22C = (22Z, 22Z)
+22Z = (22B, 22B)
+XXX = (XXX, XXX)
+");
+
+        assert_eq!(part2(&input), 6);
     }
 
 }
