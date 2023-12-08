@@ -45,24 +45,37 @@ fn part1(input: &Input) -> i64 {
     steps
 }
 
-fn part2(input: &Input) -> i64 {
-    let mut positions: Vec<&str> = input.network.keys().filter(|k| k.ends_with("A")).cloned().collect();
-    let mut steps = 0;
-    let mut instruction = 0;
-
-    while !positions.iter().all(|p| p.ends_with("Z")) {
-        for i in 0..positions.len() {
-            positions[i] = match input.instructions[instruction] {
-                Direction::R => input.network[positions[i]].1,
-                Direction::L => input.network[positions[i]].0,
-                    
-            };
-        }
-        steps += 1;
-        instruction = (instruction + 1) % input.instructions.len();
+fn lcm(numbers: &[i64]) -> i64 {
+    if numbers.len() == 1 {
+        return numbers[0];
     }
+    return num::integer::lcm(numbers[0], lcm(&numbers[1..]));
+}
 
-    steps
+fn part2(input: &Input) -> i64 {
+    let positions: Vec<&str> = input.network.keys().filter(|k| k.ends_with("A")).cloned().collect();
+    let mut zsteps: Vec<i64> = Vec::new();
+
+    for starting_position in positions {
+        let mut position = starting_position;
+        let mut instruction = 0;
+        let mut steps = 0;
+
+        loop {
+            position = match input.instructions[instruction] {
+                Direction::R => input.network[position].1,
+                Direction::L => input.network[position].0,
+            };
+            steps += 1;
+            instruction = (instruction + 1) % input.instructions.len();
+
+            if position.ends_with("Z") {
+                zsteps.push(steps);
+                break;
+            }
+        }
+    }
+    lcm(&zsteps)
 }
 
 pub fn day8() {
